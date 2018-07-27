@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <style>
+        .container{
+            border: 1px solid black;
+            height: 1000px;
+            width: 1000px;
+            padding: 20px;
+            display: inline-block;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        #left{
+            border: 1px solid black;
+            height: 800px;
+            width: 300px;
+            overflow: auto;
+            padding: 20px;
+            display:inline-block;
+            position: relative;
+            top: 40px;
+        }
+        #right{
+            height: auto;
+            width: 400px;
+            padding: 20px;
+            display:inline-block;
+        }
+        fieldset{
+            border: 1px solid black;
+            height: 500px;
+            width: 300px;
+            overflow: auto;
+            padding: 20px;
+            display:inline-block;
+            
+        }
+        #add{
+            height: 300px;
+            width: 300px;
+            position: relative;
+            top: 30px;
+
+        }
+        .quotes{
+            border: 1px solid black;
+            height: 200px;
+            width: 250px;
+        }
+        .quotes a{
+            text-align: left;
+        }
+        
+        
+
+    </style>
+</head>
+<body>
+    <h2> Welcome {{request.session.first_name}}</h2>
+    <h4> Quotable Quotes</h4>
+    <a href="/logout">logout</a>
+    <div class="container">
+        <div id='left'>
+            <form action="/dashbord" method="post">
+                {% csrf_token %}
+                {% for x in all_quotes %}
+                <div class='quotes'>
+                    <p> {{ x.quoted_by }} {{ x.quote }}</p>
+                    Posted by: <a href="/view/{{ x.addby_id }}">{{x.addby.first_name}}</a>
+                    <p><a href="/favorite/{{ x.id }}" > "Add to My List"</a></p>
+                    
+                </div>
+                {% endfor %}    
+
+            </form>
+        </div>   
+        <div id='right'>
+            <fieldset>
+                <legend>Your Favorites</legend> 
+                <form action="/dashbord" method="post">
+                    {% csrf_token %}
+                        {% for x in fav_quotes %}
+                        <div class='quotes'>
+                            <p> {{ x.quote.quoted_by }}{{ x.quote.quote }}</p>
+                            Posted by: <a href="/view/{{ x.quote.id }}">{{x.quote.addby.first_name}}</a>
+                            <p><a href="/remove/{{ x.quote.id }}">Remove From My List</a></p>
+                            
+                        </div>
+                        {% endfor %}
+                </form>
+            </fieldset>  
+            <div id='add'>
+                <h3> Contribute a Quote:</h3>
+                <form action="/create" method="post">
+                    {% csrf_token %}
+                    <p>Quoted By: <input type="text" name="quoted_by"></p>
+                    <p>Message:   <textarea name='quote'></textarea></p>
+                    <input type='hidden' name='user_id' value='{{request.session.user_id}}'>
+                    <input type="submit" value="Submit">
+                </form>
+            </div> 
+        </div>
+    </div>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
